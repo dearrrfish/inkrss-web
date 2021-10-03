@@ -34,6 +34,7 @@ import { Input, InputGroup } from "@chakra-ui/react";
 const subAtom = atom("");
 const domainAtom = atom("");
 const secretAtom = atom("");
+
 export default function Test() {
   const { colorMode, toggleColorMode } = useColorMode();
   const toast = useToast();
@@ -41,7 +42,8 @@ export default function Test() {
   const [secret, setsecret] = useAtom(secretAtom);
   const [hasMounted, setHasMounted] = React.useState(false);
   const [suburl, setsuburl] = useAtom(subAtom);
-  const { data } = useSWR(`https://${domain}/${secret}/feeds`);
+  const baseUrl = `https://${domain}/${secret}`
+  const { data } = useSWR(`${baseUrl}/feeds`);
   React.useEffect(() => {
     setdomain(location.host)
     setsecret(location.pathname.substring(1))
@@ -50,13 +52,13 @@ export default function Test() {
   const handledelete = async (e) => {
     e.preventDefault();
     let url = e.currentTarget.getAttribute("url");
-    const res = await fetch(`https://${domain}/${secret}/deleteitem`, {
+    const res = await fetch(`${baseUrl}/deleteitem`, {
       method: "post",
       body: JSON.stringify({ url: url }),
     })
       .then((r) => r.json())
       .then((r) => {
-        if (r.status != 0) {
+        if (r.status != 200) {
           toast({
             position: "bottom-right",
             title: "Error!",
@@ -76,17 +78,17 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`${baseUrl}/feeds`);
   };
   const handlesub = async (e) => {
     e.preventDefault();
-    const res = await fetch(`https://${domain}/${secret}/subitem`, {
+    const res = await fetch(`${baseUrl}/subitem`, {
       method: "post",
       body: JSON.stringify({ url: suburl }),
     })
       .then((r) => r.json())
       .then((r) => {
-        if (r.status != 0) {
+        if (r.status != 200) {
           toast({
             position: "bottom-right",
             title: "Error!",
@@ -106,12 +108,12 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`${baseUrl}/feeds`);
   };
   const handleActive = async (e) => {
     e.preventDefault();
     console.log(e.currentTarget.getAttribute("state"));
-    const res = await fetch(`https://${domain}/${secret}/active`, {
+    const res = await fetch(`${baseUrl}/active`, {
       method: "POST",
       body: JSON.stringify({
         url: e.currentTarget.getAttribute("url"),
@@ -120,7 +122,7 @@ export default function Test() {
     })
       .then((r) => r.json())
       .then((r) => {
-        if (r.status != 0) {
+        if (r.status != 200) {
           toast({
             position: "bottom-right",
             title: "Error!",
@@ -140,12 +142,12 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`${baseUrl}/feeds`);
   };
   const handleTelegraph = async (e) => {
     e.preventDefault();
     console.log(e.currentTarget.getAttribute("state"));
-    const res = await fetch(`https://${domain}/${secret}/telegraph`, {
+    const res = await fetch(`${baseUrl}/telegraph`, {
       method: "POST",
       body: JSON.stringify({
         url: e.currentTarget.getAttribute("url"),
@@ -154,7 +156,7 @@ export default function Test() {
     })
       .then((r) => r.json())
       .then((r) => {
-        if (r.status != 0) {
+        if (r.status != 200) {
           toast({
             position: "bottom-right",
             title: "Error!",
@@ -174,7 +176,7 @@ export default function Test() {
           });
         }
       });
-    mutate(`https://${domain}/${secret}/feeds`);
+    mutate(`${baseUrl}/feeds`);
   };
   if (!data || !hasMounted) {
     return (
